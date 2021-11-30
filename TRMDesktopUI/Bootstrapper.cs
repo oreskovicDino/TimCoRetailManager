@@ -7,6 +7,8 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Controls;
+    using TRMDesktopUI.Helpers;
     using TRMDesktopUI.ViewModels;
 
     public class Bootstrapper : BootstrapperBase
@@ -16,6 +18,11 @@
         public Bootstrapper()
         {
             Initialize();
+
+            ConventionManager.AddElementConvention<PasswordBox>(
+            PasswordBoxHelper.BoundPasswordProperty,
+            "Password",
+            "PasswordChanged");
         }
 
         protected override void Configure()
