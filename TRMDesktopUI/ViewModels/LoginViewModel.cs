@@ -6,11 +6,18 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TRMDesktopUI.Helpers;
 
     public class LoginViewModel : Screen
     {
+        private IAPIHelper helper;
         private string _userName;
         private string _password;
+
+        public LoginViewModel(IAPIHelper helper)
+        {
+            this.helper = helper;
+        }
 
         public string UserName
         {
@@ -47,9 +54,16 @@
             }
         }
 
-        public void LogIn(string userName, string password)
+        public async Task LogIn()
         {
-            Console.WriteLine();
+            try
+            {
+                var result = await helper.Authenticate(UserName, Password);
+            }
+            catch(Exception ex )
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
