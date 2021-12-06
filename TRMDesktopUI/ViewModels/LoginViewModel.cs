@@ -41,6 +41,38 @@
            }
         }
 
+        private bool isErrorVisible;
+
+        public bool IsErrorVisible
+        {
+            get { 
+            bool output = false;
+                if (ErrorMessage?.Length > 0)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+            set {
+                NotifyOfPropertyChange(() => IsErrorVisible);
+                isErrorVisible = value; 
+            }
+        }
+
+        private string errorMessage;
+
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            set {
+                errorMessage = value; 
+                NotifyOfPropertyChange(() => IsErrorVisible );
+                NotifyOfPropertyChange(() => ErrorMessage);
+            }
+        }
+
+
         public bool CanLogIn
         {
             get{
@@ -58,11 +90,13 @@
         {
             try
             {
+                ErrorMessage = "";
+
                 var result = await helper.Authenticate(UserName, Password);
             }
             catch(Exception ex )
             {
-                Console.WriteLine(ex.Message);
+                ErrorMessage = ex.Message;
             }
         }
     }
