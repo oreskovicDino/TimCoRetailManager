@@ -8,6 +8,8 @@
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
+    using TRMDesktop.Library.Api;
+    using TRMDesktop.Library.Models;
     using TRMDesktopUI.Helpers;
     using TRMDesktopUI.ViewModels;
 
@@ -31,6 +33,7 @@
             container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
+                .Singleton<ILoggedInUserModel,LoggedInUserModel>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             GetType().Assembly.GetTypes()

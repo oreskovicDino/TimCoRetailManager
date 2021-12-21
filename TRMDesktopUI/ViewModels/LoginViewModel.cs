@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TRMDesktop.Library.Api;
     using TRMDesktopUI.Helpers;
 
     public class LoginViewModel : Screen
@@ -83,6 +84,8 @@
                     output = true;
                 }
                 return output;
+                //Capture more information about the user.
+
             }
         }
 
@@ -93,8 +96,10 @@
                 ErrorMessage = "";
 
                 var result = await helper.Authenticate(UserName, Password);
+                await helper.GetLoggedInUserInfo(result.Access_Token);
+                
             }
-            catch(Exception ex )
+            catch (Exception ex )
             {
                 ErrorMessage = ex.Message;
             }
