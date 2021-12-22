@@ -1,4 +1,4 @@
-﻿namespace TRMDesktopUI.Helpers
+﻿namespace TRMDesktop.Library.Api
 {
     using System;
     using System.Collections.Generic;
@@ -8,15 +8,18 @@
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
+    using TRMDesktop.Library.Models;
     using TRMDesktopUI.Models;
 
     public class APIHelper : IAPIHelper
     {
         public HttpClient apiClient;
+        private ILoggedInUserModel loggedInUserModel;
 
-        public APIHelper()
+        public APIHelper(ILoggedInUserModel loggedInUserModel)
         {
             InitializeClient();
+            this.loggedInUserModel = loggedInUserModel;
         }
 
         private void InitializeClient()
@@ -25,8 +28,7 @@
 
             apiClient = new HttpClient();
             apiClient.BaseAddress = new Uri(api);
-            apiClient.DefaultRequestHeaders.Accept.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/jsoon"));
+            
         }
 
         public async Task<AuthenticatedUser> Authenticate(string username, string password)
@@ -51,6 +53,33 @@
                 }
             }
 
+        }
+
+        public async Task GetLoggedInUserInfo(string token)
+        {
+            apiClient.DefaultRequestHeaders.Clear();
+            apiClient.DefaultRequestHeaders.Accept.Clear();
+            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/jsoon"));
+            apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            using (HttpResponseMessage response = await apiClient.GetAsync("/api/User"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<LoggedInUserModel>();
+                    loggedInUserModel.CreatedDate = result.CreatedDate;
+                    loggedInUserModel.EmailAddress = result.EmailAddress;   
+                    loggedInUserModel.FirsName = result.FirsName;   
+                    loggedInUserModel.Id = result.Id;  
+                    loggedInUserModel.LastName = result.LastName;   
+                    loggedInUserModel.Token = token;
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+
+                }
+            }
         }
     }
 }

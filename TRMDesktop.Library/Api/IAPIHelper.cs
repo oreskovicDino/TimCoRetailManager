@@ -1,4 +1,4 @@
-﻿namespace TRMDesktopUI.Helpers
+﻿namespace TRMDesktop.Library.Api
 {
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -7,5 +7,6 @@
     public interface IAPIHelper
     {
         Task<AuthenticatedUser> Authenticate(string username, string password);
+        Task GetLoggedInUserInfo(string token);
     }
 }
