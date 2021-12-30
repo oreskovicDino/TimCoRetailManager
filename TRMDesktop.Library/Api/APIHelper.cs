@@ -13,7 +13,13 @@
 
     public class APIHelper : IAPIHelper
     {
-        public HttpClient apiClient;
+        private HttpClient apiClient;
+
+        public HttpClient ApiClient
+        {
+            get { return apiClient; }
+        }
+
         private ILoggedInUserModel loggedInUserModel;
 
         public APIHelper(ILoggedInUserModel loggedInUserModel)
