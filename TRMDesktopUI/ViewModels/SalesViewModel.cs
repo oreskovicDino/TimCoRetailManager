@@ -1,63 +1,61 @@
 ﻿namespace TRMDesktopUI.ViewModels
 {
     using Caliburn.Micro;
-    using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using TRMDesktop.Library.Api;
+    using TRMDesktop.Library.Helpers;
     using TRMDesktop.Library.Models;
 
-    public class SalesViewModel: Screen
+    public class SalesViewModel : Screen
     {
+        private int itemQuantity = 1;
+        private IProductEndpoint productEndpoint;
+        private IConfigHelper configHelper;
         private BindingList<ProductModel> product;
+        private ProductModel selectedProduct;
+        private BindingList<CartItemModel> cart = new BindingList<CartItemModel>();
+
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        {
+            this.productEndpoint = productEndpoint;
+            this.configHelper = configHelper;
+        }
 
         public BindingList<ProductModel> Products
         {
             get { return product; }
             set
-            { 
-                product = value; 
+            {
+                product = value;
                 NotifyOfPropertyChange(() => Products);
             }
         }
 
-        private ProductModel selectedProduct;
 
         public ProductModel SelectedProduct
         {
             get { return selectedProduct; }
-            set {
+            set
+            {
                 selectedProduct = value;
-                NotifyOfPropertyChange(()=> SelectedProduct);
-                NotifyOfPropertyChange(()=> CanAddToCart);
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
-
-        private BindingList<CartItemModel> cart = new BindingList<CartItemModel>();
 
         public BindingList<CartItemModel> Cart
         {
             get { return cart; }
             set
             {
-                cart = value; 
+                cart = value;
                 NotifyOfPropertyChange(() => Cart);
             }
         }
-                
-        private int itemQuantity = 1;
 
-        private IProductEndpoint productEndpoint;
-
-        public SalesViewModel(IProductEndpoint productEndpoint)
-        {
-            this.productEndpoint = productEndpoint;
-            
-        }
 
         protected override async void OnViewLoaded(object view)
         {
@@ -75,27 +73,62 @@
         public int ItemQuantity
         {
             get { return itemQuantity; }
-            set { 
+            set
+            {
                 itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
                 NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
-        public string SubTotal { 
-            get {
-                decimal subTotal = 0;
-                foreach (var item in Cart)
-                {
-                    subTotal += (item.Product.RetailPrice * item.QuantityInCart);
-                }
-                return subTotal.ToString("C");
+        public string SubTotal
+        {
+            get
+            {
+                return CalculateSubTotal().ToString("C");
             }
         }
 
-        public string Tax { get { return "$0.00"; } }
+        private decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+            foreach (var item in Cart)
+            {
+                subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+            }
+            return subTotal;
+        }
 
-        public string Total { get { return "$0.00"; } }
+        public string Tax
+        {
+            get
+            {
+                return CalculateTax().ToString("C");
+            }
+        }
+
+        private decimal CalculateTax()
+        {
+            decimal taxAmount = 0;
+            decimal taxRate = configHelper.GetTaxRate() / 100;
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate);
+                }
+            }
+            return taxAmount;
+        }
+
+        public string Total
+        {
+            get
+            {
+                decimal total = CalculateSubTotal() + CalculateTax();
+                return total.ToString("C");
+            }
+        }
 
         public bool CanAddToCart
         {
@@ -109,7 +142,7 @@
                 {
                     output = true;
                 }
-                               
+
                 return output;
             }
         }
@@ -133,12 +166,14 @@
                 };
                 Cart.Add(cartItemModel);
             }
-          
+
             SelectedProduct.QuantityInStock -= ItemQuantity;
-            ItemQuantity = 1; 
+            ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
-        } 
-        
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+        }
+
         public bool CanRemoveFromCart
         {
             get
@@ -146,7 +181,7 @@
                 bool output = false;
 
                 //TODO: Make sure something is selected.
-                               
+
                 return output;
             }
         }
@@ -154,6 +189,8 @@
         public void RemoveFromCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanCheckout
