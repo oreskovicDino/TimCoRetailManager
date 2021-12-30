@@ -9,6 +9,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using TRMDesktop.Library.Api;
+    using TRMDesktop.Library.Helpers;
     using TRMDesktop.Library.Models;
     using TRMDesktopUI.Helpers;
     using TRMDesktopUI.ViewModels;
@@ -36,6 +37,7 @@
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel,LoggedInUserModel>()
+                .Singleton<IConfigHelper,ConfigHelper>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             GetType().Assembly.GetTypes()
