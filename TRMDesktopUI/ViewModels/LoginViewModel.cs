@@ -14,8 +14,8 @@
     {
         private IAPIHelper helper;
         private IEventAggregator eventAggregator;
-        private string _userName;
-        private string _password;
+        private string _userName = "dev@email.com";
+        private string _password = "Pwd1234.";
 
         public LoginViewModel(IAPIHelper helper, IEventAggregator eventAggregator)
         {
