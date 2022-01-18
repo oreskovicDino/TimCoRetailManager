@@ -1,22 +1,25 @@
 ﻿namespace TRMDesktopUI.ViewModels
 {
     using Caliburn.Micro;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+    using TRMDesktopUI.EventModels;
 
-    public class ShellViewModel : Conductor<object>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
     {
-        private LoginViewModel _loginVM;
+        private IEventAggregator @event;
+        private SalesViewModel salsesVM;
 
-        public ShellViewModel(LoginViewModel loginVM)
+        public ShellViewModel(IEventAggregator @event, SalesViewModel salsesVM)
         {
-            _loginVM = loginVM;
-            ActivateItem(_loginVM);
-           
+            this.salsesVM = salsesVM;
+            this.@event = @event;
+            this.@event.Subscribe(this);
+
+            ActivateItem(IoC.Get<LoginViewModel>());
         }
 
+        public void Handle(LogOnEvent message)
+        {
+            ActivateItem(salsesVM);
+        }
     }
 }

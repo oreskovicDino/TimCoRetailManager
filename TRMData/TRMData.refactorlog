@@ -14,4 +14,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FirstName" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="dbdb445f-b9c9-4d10-a596-fd117c0c1941" ChangeDateTime="12/27/2021 15:33:52">
+    <Property Name="ElementName" Value="[dbo].[Product].[QuantityInStocl]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Product]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="QuantityInStock" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="85b4fd7e-8e24-4352-a975-a4a3df9b238a" ChangeDateTime="12/30/2021 19:08:09">
+    <Property Name="ElementName" Value="[dbo].[FK_Inventory_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[Inventory]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_Inventory_ToProduct]" />
+  </Operation>
 </Operations>

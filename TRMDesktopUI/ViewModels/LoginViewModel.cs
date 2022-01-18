@@ -7,17 +7,20 @@
     using System.Text;
     using System.Threading.Tasks;
     using TRMDesktop.Library.Api;
+    using TRMDesktopUI.EventModels;
     using TRMDesktopUI.Helpers;
 
     public class LoginViewModel : Screen
     {
         private IAPIHelper helper;
-        private string _userName;
-        private string _password;
+        private IEventAggregator eventAggregator;
+        private string _userName = "dev@email.com";
+        private string _password = "Pwd1234.";
 
-        public LoginViewModel(IAPIHelper helper)
+        public LoginViewModel(IAPIHelper helper, IEventAggregator eventAggregator)
         {
             this.helper = helper;
+            this.eventAggregator = eventAggregator;
         }
 
         public string UserName
@@ -97,6 +100,8 @@
 
                 var result = await helper.Authenticate(UserName, Password);
                 await helper.GetLoggedInUserInfo(result.Access_Token);
+
+                eventAggregator.PublishOnUIThread(new LogOnEvent());
                 
             }
             catch (Exception ex )
