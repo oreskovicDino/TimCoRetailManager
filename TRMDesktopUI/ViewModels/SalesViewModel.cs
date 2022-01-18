@@ -1,12 +1,15 @@
 ﻿namespace TRMDesktopUI.ViewModels
 {
+    using AutoMapper;
     using Caliburn.Micro;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
     using TRMDesktop.Library.Api;
     using TRMDesktop.Library.Helpers;
     using TRMDesktop.Library.Models;
+    using TRMDesktopUI.Models;
 
     public class SalesViewModel : Screen
     {
@@ -14,15 +17,17 @@
         private IProductEndpoint productEndpoint;
         private IConfigHelper configHelper;
         private ISaleEndpoint saleEndpoint;
-        private BindingList<ProductModel> product;
-        private ProductModel selectedProduct;
-        private BindingList<CartItemModel> cart = new BindingList<CartItemModel>();
+        private readonly IMapper mapper;
+        private BindingList<ProductDisplayModel> product;
+        private ProductDisplayModel selectedProduct;
+        private BindingList<CartItemDisplayModel> cart = new BindingList<CartItemDisplayModel>();
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint, IMapper mapper)
         {
             this.productEndpoint = productEndpoint;
             this.configHelper = configHelper;
             this.saleEndpoint = saleEndpoint;
+            this.mapper = mapper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -31,7 +36,7 @@
             await LoadProducts();
         }
 
-        public BindingList<ProductModel> Products
+        public BindingList<ProductDisplayModel> Products
         {
             get { return product; }
             set
@@ -41,7 +46,7 @@
             }
         }
 
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return selectedProduct; }
             set
@@ -52,7 +57,7 @@
             }
         }
 
-        public BindingList<CartItemModel> Cart
+        public BindingList<CartItemDisplayModel> Cart
         {
             get { return cart; }
             set
@@ -145,8 +150,8 @@
         private async Task LoadProducts()
         {
             var produtList = await productEndpoint.GetAll();
-
-            Products = new BindingList<ProductModel>(produtList);
+            var products = mapper.Map<List<ProductDisplayModel>>(produtList);
+            Products = new BindingList<ProductDisplayModel>(products);
         }
 
         private decimal CalculateSubTotal()
@@ -173,21 +178,19 @@
         public void AddToCart()
         {
 
-            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+            CartItemDisplayModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
             if (existingItem != null)
             {
                 existingItem.QuantityInCart += ItemQuantity;
-                Cart.Remove(existingItem);
-                Cart.Add(existingItem);
             }
             else
             {
-                CartItemModel cartItemModel = new CartItemModel
+                CartItemDisplayModel CartItemDisplayModel = new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity
                 };
-                Cart.Add(cartItemModel);
+                Cart.Add(CartItemDisplayModel);
             }
 
             SelectedProduct.QuantityInStock -= ItemQuantity;
@@ -216,7 +219,7 @@
                     ProductId = item.Product.Id,
                     Quantity = item.QuantityInCart
                 });
-                 
+
             }
 
             await saleEndpoint.PostSale(sale);

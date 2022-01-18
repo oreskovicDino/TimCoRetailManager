@@ -1,17 +1,17 @@
 ﻿namespace TRMDesktopUI
 {
+    using AutoMapper;
     using Caliburn.Micro;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using TRMDesktop.Library.Api;
     using TRMDesktop.Library.Helpers;
     using TRMDesktop.Library.Models;
     using TRMDesktopUI.Helpers;
+    using TRMDesktopUI.Models;
     using TRMDesktopUI.ViewModels;
 
     public class Bootstrapper : BootstrapperBase
@@ -28,17 +28,30 @@
             "PasswordChanged");
         }
 
+        private IMapper ConfigureAutoMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+            var output = config.CreateMapper();
+            return output;
+        }
+
         protected override void Configure()
         {
+            container.Instance(ConfigureAutoMapper());
+
             container.Instance(container)
                 .PerRequest<IProductEndpoint, ProductEndpoint>()
                 .PerRequest<ISaleEndpoint, SaleEndpoint>();
-            
+
             container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
-                .Singleton<ILoggedInUserModel,LoggedInUserModel>()
-                .Singleton<IConfigHelper,ConfigHelper>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>()
+                .Singleton<IConfigHelper, ConfigHelper>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             GetType().Assembly.GetTypes()
