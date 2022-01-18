@@ -20,6 +20,7 @@
         private readonly IMapper mapper;
         private BindingList<ProductDisplayModel> product;
         private ProductDisplayModel selectedProduct;
+        private CartItemDisplayModel selectedCartItem;
         private BindingList<CartItemDisplayModel> cart = new BindingList<CartItemDisplayModel>();
 
         public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint, IMapper mapper)
@@ -54,6 +55,17 @@
                 selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
+            }
+        }
+
+        public CartItemDisplayModel SelectedCartItem
+        {
+            get { return selectedCartItem; }
+            set
+            {
+                selectedCartItem = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
             }
         }
 
@@ -104,9 +116,10 @@
             get
             {
                 bool output = false;
-
-                //TODO: Make sure something is selected.
-
+                if (SelectedCartItem != null && SelectedCartItem?.Product.QuantityInStock > 0)
+                {
+                    output = true;
+                }
                 return output;
             }
         }
@@ -203,6 +216,17 @@
 
         public void RemoveFromCart()
         {
+
+
+            SelectedCartItem.Product.QuantityInStock += 1;
+            if (SelectedCartItem.QuantityInCart > 1)
+            {
+                SelectedCartItem.QuantityInCart -= 1;
+            }
+            else
+            {
+                Cart.Remove(SelectedCartItem);
+            }
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
