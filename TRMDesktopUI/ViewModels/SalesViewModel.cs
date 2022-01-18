@@ -69,6 +69,17 @@
             }
         }
 
+        private async Task ResetSalesViewModel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+            await LoadProducts();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckout);
+        }
+
         public BindingList<CartItemDisplayModel> Cart
         {
             get { return cart; }
@@ -116,7 +127,7 @@
             get
             {
                 bool output = false;
-                if (SelectedCartItem != null && SelectedCartItem?.Product.QuantityInStock > 0)
+                if (SelectedCartItem != null && SelectedCartItem?.QuantityInCart > 0)
                 {
                     output = true;
                 }
@@ -231,6 +242,7 @@
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckout);
+            NotifyOfPropertyChange(() => CanAddToCart);
         }
 
         public async Task Checkout()
@@ -238,6 +250,7 @@
             SaleModel sale = new SaleModel();
             foreach (var item in Cart)
             {
+                //Add exception hadeling 
                 sale.SaleDetails.Add(new SaleDetailModel
                 {
                     ProductId = item.Product.Id,
@@ -247,6 +260,8 @@
             }
 
             await saleEndpoint.PostSale(sale);
+
+            await ResetSalesViewModel();
         }
 
     }
