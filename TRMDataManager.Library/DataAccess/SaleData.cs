@@ -13,7 +13,7 @@
             // TODO: Make this SOLID/DRY/Better
             List<SaleDetailDbModel> details = new List<SaleDetailDbModel>();
             ProductData products = new ProductData();
-            decimal taxRate = ConfigHelper.GetTaxRate()/100;
+            decimal taxRate = ConfigHelper.GetTaxRate() / 100;
 
             foreach (var item in saleInfo.SaleDetails)
             {
@@ -39,7 +39,7 @@
                 details.Add(detail);
             }
 
-            SaleDbModel sale = new SaleDbModel  
+            SaleDbModel sale = new SaleDbModel
             {
                 SubTotal = details.Sum(x => x.PurchasePrice),
                 Tax = details.Sum(x => x.Tax),
@@ -48,16 +48,29 @@
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            SqlDataAccess sql = new SqlDataAccess();
-            sql.SaveData("dbo.spSale_Insert", sale, "TRMData");
-
-            sale.Id = sql.LoadData<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate}, "TRMData").FirstOrDefault<int>();
-
-            foreach (var item in details)
+            using (SqlDataAccess sql = new SqlDataAccess())
             {
-                item.SaleId = sale.Id;
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "TRMData");
+                try
+                {
+                    sql.StartTransaction("TRMData");
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
 
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate }).FirstOrDefault<int>();
+
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+                    sql.CommitTransaction();
+                }
+                catch 
+                {
+                    //TODO: Add user notification.
+                    //TODO: Add exception handeling.
+                    sql.RollbackTransaction();
+                    throw;
+                }
             }
         }
     }
