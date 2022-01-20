@@ -12,6 +12,7 @@
     {
         private IDbConnection _connection;
         private IDbTransaction transaction;
+        private bool isTransactionClosed = false;
 
         public string GetConnectionString(string name)
         {
@@ -44,6 +45,7 @@
             _connection.Open();
 
             transaction = _connection.BeginTransaction();
+            isTransactionClosed = false;
         }
 
         // Load using the transaction.
@@ -63,18 +65,33 @@
         {
             transaction?.Commit();
             _connection?.Close();
-
+            isTransactionClosed = true;
         }
 
         public void RollbackTransaction()
         {
             transaction?.Rollback();
+            isTransactionClosed = true;
+
         }
 
         // Dispose.
         public void Dispose()
         {
-            CommitTransaction();
+            if (!isTransactionClosed)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch
+                {
+                    //TODO: log this issue.
+                }
+            }
+
+            transaction = null;
+            _connection = null;
         }
     }
 }

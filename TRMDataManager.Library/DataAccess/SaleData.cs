@@ -10,7 +10,7 @@
     {
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
-            // TODO: Make this SOLID/DRY/Better
+            // TODO: Make this SOLID | DRY | Better
             List<SaleDetailDbModel> details = new List<SaleDetailDbModel>();
             ProductData products = new ProductData();
             decimal taxRate = ConfigHelper.GetTaxRate() / 100;
