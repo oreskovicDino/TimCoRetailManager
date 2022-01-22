@@ -64,7 +64,7 @@
                     }
                     sql.CommitTransaction();
                 }
-                catch 
+                catch
                 {
                     //TODO: Add user notification.
                     //TODO: Add exception handeling.
@@ -72,6 +72,14 @@
                     throw;
                 }
             }
+        }
+
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sql = new SqlDataAccess();
+
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.[spSale_SaleReport]", new { }, "TRMData");
+            return output;
         }
     }
 }
