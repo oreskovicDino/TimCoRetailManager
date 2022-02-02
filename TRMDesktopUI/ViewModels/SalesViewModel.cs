@@ -2,10 +2,13 @@
 {
     using AutoMapper;
     using Caliburn.Micro;
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Dynamic;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
     using TRMDesktop.Library.Api;
     using TRMDesktop.Library.Helpers;
     using TRMDesktop.Library.Models;
@@ -17,24 +20,57 @@
         private IProductEndpoint productEndpoint;
         private IConfigHelper configHelper;
         private ISaleEndpoint saleEndpoint;
-        private readonly IMapper mapper;
+        private IMapper mapper;
+        private StatusInfoViewModel status;
+        private IWindowManager window;
         private BindingList<ProductDisplayModel> product;
         private ProductDisplayModel selectedProduct;
         private CartItemDisplayModel selectedCartItem;
         private BindingList<CartItemDisplayModel> cart = new BindingList<CartItemDisplayModel>();
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint, IMapper mapper)
+        public SalesViewModel(
+            IProductEndpoint productEndpoint,
+            IConfigHelper configHelper,
+            ISaleEndpoint saleEndpoint,
+            IMapper mapper,
+            StatusInfoViewModel status,
+            IWindowManager window
+            )
         {
             this.productEndpoint = productEndpoint;
             this.configHelper = configHelper;
             this.saleEndpoint = saleEndpoint;
             this.mapper = mapper;
+            this.status = status;
+            this.window = window;
         }
 
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            await LoadProducts();
+            try
+            {
+                await LoadProducts();
+            }
+            catch (Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLopcation = WindowStartupLocation.CenterOwner;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "System Error";
+
+                if (ex.Message == "Unauthorized")
+                {
+                    status.UpdateMessage("Unauthorize Access!", "You do not have permission to interact wiht the Sale Form.");
+                    window.ShowDialog(status, null, settings);
+                }
+                else
+                {
+                    status.UpdateMessage("Fatal Exception!", ex.Message);
+                    window.ShowDialog(status, null, settings);
+                }
+                TryClose();
+            }
         }
 
         public BindingList<ProductDisplayModel> Products
