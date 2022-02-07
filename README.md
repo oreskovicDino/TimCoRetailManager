@@ -1,2 +1,3 @@
 # TimCoRetailManager
-A reatail menagment system
+---
+WIP demo app. A retail management system.
