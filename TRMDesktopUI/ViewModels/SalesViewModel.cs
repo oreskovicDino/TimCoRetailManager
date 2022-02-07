@@ -2,7 +2,6 @@
 {
     using AutoMapper;
     using Caliburn.Micro;
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Dynamic;

@@ -39,7 +39,7 @@
                 details.Add(detail);
             }
 
-            SaleDbModel sale = new SaleDbModel
+            SaleDbModel sale = new SaleDbModel  
             {
                 SubTotal = details.Sum(x => x.PurchasePrice),
                 Tax = details.Sum(x => x.Tax),
@@ -57,9 +57,9 @@
 
                     sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate }).FirstOrDefault<int>();
 
-                    foreach (var item in details)
-                    {
-                        item.SaleId = sale.Id;
+            foreach (var item in details)
+            {
+                item.SaleId = sale.Id;
                         sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
                     }
                     sql.CommitTransaction();
