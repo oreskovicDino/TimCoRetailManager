@@ -52,10 +52,13 @@
     <Compile Include="Api\IAPIHelper.cs" />
     <Compile Include="Api\IProductEndpoint.cs" />
     <Compile Include="Api\ISaleEndpoint.cs" />
+    <Compile Include="Api\IUserEndpoint.cs" />
     <Compile Include="Api\ProductEndpoint.cs" />
     <Compile Include="Api\SaleEndpoint.cs" />
+    <Compile Include="Api\UserEndpoint.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Helpers\IConfigHelper.cs" />
+    <Compile Include="Models\ApplicationUserModel.cs" />
     <Compile Include="Models\AuthenticatedUser.cs" />
     <Compile Include="Models\CartItemModel.cs" />
     <Compile Include="Models\ILoggedInUserModel.cs" />
@@ -63,11 +66,18 @@
     <Compile Include="Models\ProductModel.cs" />
     <Compile Include="Models\SaleDetailModel.cs" />
     <Compile Include="Models\SaleModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TRMDataManager.Library\TRMDataManager.Library.csproj">
+      <Project>{CBD52004-3398-4EFC-B750-06AEAF535973}</Project>
+      <Name>TRMDataManager.Library</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
