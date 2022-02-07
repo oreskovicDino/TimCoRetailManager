@@ -34,6 +34,11 @@
             TryClose();
         }
 
+        public void UserManagment()
+        {
+            ActivateItem(IoC.Get<UserDisplayViewModel>());
+        }
+
         private bool isLoggedIn;
 
         public bool IsLoggedIn
@@ -42,7 +47,7 @@
             {
                 bool output = false;
 
-                if (string.IsNullOrWhiteSpace(user.Token) == false )
+                if (string.IsNullOrWhiteSpace(user.Token) == false)
                 {
                     output = true;
                 }
